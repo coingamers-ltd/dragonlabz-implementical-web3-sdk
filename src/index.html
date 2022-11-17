@@ -2,15 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
-            type="application/javascript"></script>
+    <title>Implementical Web3 Sdk Web Usage</title>
 </head>
 <body>
 
-<script type="module" defer src="dist/web_usage.js"></script>
 <script type="module">
-    import Web3Sdk from './dist/web_usage.js';
+    import Web3Sdk from './web_usage.js';
     const web3Sdk = new Web3Sdk();
     web3Sdk.getOffChainSignature([1, 2, 3]).then((result)=> console.log('offchain signature: ', result));
 </script>
