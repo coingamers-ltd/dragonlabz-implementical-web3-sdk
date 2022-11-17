@@ -21,7 +21,6 @@ export default function Web3Sdk() {
             
             You are about to burn the tokenIDs below:
             ${tokenIds.join(',')}
-            
             Please sign the request.`
 
             const signature = await signer.signMessage(msg);
