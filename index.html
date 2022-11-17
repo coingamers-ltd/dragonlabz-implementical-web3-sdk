@@ -8,13 +8,10 @@
 </head>
 <body>
 
-
-<script type="module" defer src="dist/legacy.js"></script>
+<script type="module" defer src="dist/web_usage.js"></script>
 <script type="module">
-    import Web3Sdk from './dist/legacy.js';
-
+    import Web3Sdk from './dist/web_usage.js';
     const web3Sdk = new Web3Sdk();
-
     web3Sdk.getOffChainSignature([1, 2, 3]).then((result)=> console.log('offchain signature: ', result));
 </script>
 </body>
