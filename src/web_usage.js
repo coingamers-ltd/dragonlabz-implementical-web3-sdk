@@ -26,7 +26,102 @@ export default function Web3Sdk() {
         }
     }
 
+    const getPermitSignatureERC20 = async (signer, tokens, spender, value, deadline) => {
+        const [nonce, name, version, chainId] = await Promise.all([
+            tokens.nonces(signer.address),
+            tokens.name(),
+            "1",
+            signer.getChainId(),
+        ])
+
+        return await signer._signTypedData(
+            {
+                name,
+                version,
+                chainId,
+                verifyingContract: tokens.address,
+            },
+            {
+                Permit: [
+                    {
+                        name: "owner",
+                        type: "address",
+                    },
+                    {
+                        name: "spender",
+                        type: "address",
+                    },
+                    {
+                        name: "value",
+                        type: "uint256",
+                    },
+                    {
+                        name: "nonce",
+                        type: "uint256",
+                    },
+                    {
+                        name: "deadline",
+                        type: "uint256",
+                    },
+                ],
+            },
+            {
+                owner: signer.address,
+                spender,
+                value,
+                nonce,
+                deadline,
+            }
+        )
+    }
+
+    const getPermitSignatureERC721 = async (signer, nft, spender, tokenId, deadline) => {
+        const [nonce, name, version, chainId] = await Promise.all([
+            nft.nonces(signer.address),
+            nft.name(),
+            "1",
+            signer.getChainId(),
+        ])
+
+        return await signer._signTypedData(
+            {
+                name,
+                version,
+                chainId,
+                verifyingContract: nft.address,
+            },
+            {
+                Permit: [
+                    {
+                        name: "spender",
+                        type: "address",
+                    },
+                    {
+                        name: "tokenId",
+                        type: "uint256",
+                    },
+                    {
+                        name: "nonce",
+                        type: "uint256",
+                    },
+                    {
+                        name: "deadline",
+                        type: "uint256",
+                    },
+                ],
+            },
+            {
+                spender,
+                tokenId,
+                nonce,
+                deadline,
+            }
+        )
+    }
+
     return {
-        getOffChainSignature
+        getOffChainSignature,
+        getPermitSignatureERC20,
+        getPermitSignatureERC721
     }
 }

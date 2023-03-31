@@ -2,20 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Generate Off-Chain Signature</title>
+    <title>Generate Trade Signature</title>
 </head>
 <body>
+<button id="attach-backend-btn">Attach Backend</button>
 <button id="generate-signature-btn">Generate Signature</button>
 <script type="module">
     import Web3Sdk from "./web_usage.js";
+    import {ethers} from "https://cdn-cors.ethers.io/lib/ethers-5.5.4.esm.min.js";
+    import marketContractAbi from './v1.market.contractAbi.js';
+    import v1Erc721contractAbi from './v1.erc721.contractAbi.js';
+    import v1Erc20contractAbi from './v1.erc20.contractAbi.js';
+
     const web3Sdk = new Web3Sdk();
-    const generateSignatureBtn = document.getElementById("generate-signature-btn");
-    generateSignatureBtn.addEventListener("click", async () => {
+
+    let backend;
+    let contract;
+    const tokenId = 4;
+    const tokenAmount = 400;
+
+    document.getElementById("attach-backend-btn").addEventListener("click", async () => {
         try {
-            const message = "To sell your NFT, we need your off-chain signature to authorize our smart contract to transfer it to a buyer. This signature confirms your permission for the transfer of NFT with ID 2. You will remain the owner until the sale is completed.";
-            const result = await web3Sdk.getOffChainSignature(message);
-            console.log("Off-chain signature: ", result.signature);
-            console.log("Off-chain signature bytes: ", result.byteArray);
+            if (!window.ethereum)
+                throw new Error("No crypto wallet found. Please install it.");
+            await window.ethereum.send("eth_requestAccounts");
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            backend = provider.getSigner();
+
+            const nftContractAddress = "0xb7cee7c808686f116bff25ca4473c66cbf164370";
+            contract = new ethers.Contract(nftContractAddress, v1Erc721contractAbi, backend);
+
+            // const tokensContractAddress = "0x2aef50c35b90b5274c4e432c96c20fbe599a284b";
+            // contract = new ethers.Contract(nftContractAddress, v1Erc20contractAbi, backend);
+            
+            console.log("Successfully attached backend address: ", backend.address);
+        } catch (err) {
+            console.error("Error attaching to contract: ", err);
+        }
+    });
+
+    document.getElementById("generate-signature-btn").addEventListener("click", async () => {
+        try {
+            if (!window.ethereum)
+                throw new Error("No crypto wallet found. Please install it.");
+            await window.ethereum.send("eth_requestAccounts");
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+
+            const deadline = -1; // -1 means no deadline
+
+            const signature = await web3Sdk.getPermitSignatureERC721(signer, contract, backend.address, tokenId, deadline);
+
+            // const signature = await web3Sdk.getPermitSignatureERC2-(signer, contract, backend.address, tokenAmount, deadline);
+            console.log("Off-chain signature: ", signature);
         } catch (err) {
             console.error("Error generating off-chain signature: ", err);
         }

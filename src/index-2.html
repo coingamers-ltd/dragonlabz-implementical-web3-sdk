@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate Off-Chain Signature</title>
+</head>
+<body>
+<button id="generate-signature-btn">Generate Signature</button>
+<script type="module">
+    import Web3Sdk from "./web_usage.js";
+    const web3Sdk = new Web3Sdk();
+    const generateSignatureBtn = document.getElementById("generate-signature-btn");
+    generateSignatureBtn.addEventListener("click", async () => {
+        try {
+            const message = "To sell your NFT, we need your off-chain signature to authorize our smart contract to transfer it to a buyer. This signature confirms your permission for the transfer of NFT with ID 2. You will remain the owner until the sale is completed.";
+            const result = await web3Sdk.getOffChainSignature(message);
+            console.log("Off-chain signature: ", result.signature);
+            console.log("Off-chain signature bytes: ", result.byteArray);
+        } catch (err) {
+            console.error("Error generating off-chain signature: ", err);
+        }
+    });
+</script>
+</body>
+</html>
