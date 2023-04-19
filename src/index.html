@@ -5,60 +5,69 @@
     <title>Generate Trade Signature</title>
 </head>
 <body>
-<button id="attach-backend-btn">Attach Backend</button>
-<button id="generate-signature-btn">Generate Signature</button>
+<button id="generate-seller-signature-btn">Generate Seller Signature</button>
+<button id="generate-buyer-signature-btn">Generate Buyer Signature</button>
 <script type="module">
     import Web3Sdk from "./web_usage.js";
     import {ethers} from "https://cdn-cors.ethers.io/lib/ethers-5.5.4.esm.min.js";
-    import marketContractAbi from './v1.market.contractAbi.js';
+    // import marketContractAbi from './v1.market.contractAbi.js';
     import v1Erc721contractAbi from './v1.erc721.contractAbi.js';
     import v1Erc20contractAbi from './v1.erc20.contractAbi.js';
 
+    // const backendAddress = '0xd0C62F2ec092276D4c37e11d87C89E27CbC6A7C7';
+    
+    // const sellerAddress = '0x957973A3f7Fc01469Dd331D75a1bAa229c4E4DC5';
+    // const seller = '00000000-0000-0000-0000-000000000002';
+    
+    // const buyerAddress = '0x72a7A7f10930E1C02F41cF69D7cf0D99028bc802';
+    // const buyer = '00000000-0000-0000-0000-000000000003';
+    
+    const tokenId = 1;
+    const tokenAmount = 100;
+
+    const nftContractAddress = "0xb7cee7c808686f116bff25ca4473c66cbf164370"; //TESTH2
+    const tokensContractAddress = "0x2aef50c35b90b5274c4e432c96c20fbe599a284b"; //IGT
+    const marketContractAddress = "0xd4df5bD32b1C3519F80458575DcB2b532A963C5D"; // Dragon Race
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+    const nft = new ethers.Contract(nftContractAddress, v1Erc721contractAbi, provider);
+    const tokens = new ethers.Contract(tokensContractAddress, v1Erc20contractAbi, provider);
+    // const market = new ethers.Contract(marketContractAddress, marketContractAbi, provider);
+
     const web3Sdk = new Web3Sdk();
 
-    let backend;
-    let contract;
-    const tokenId = 4;
-    const tokenAmount = 400;
-
-    document.getElementById("attach-backend-btn").addEventListener("click", async () => {
+    document.getElementById("generate-seller-signature-btn").addEventListener("click", async () => {
         try {
             if (!window.ethereum)
                 throw new Error("No crypto wallet found. Please install it.");
             await window.ethereum.send("eth_requestAccounts");
 
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            backend = provider.getSigner();
+            // const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const deadline = 1893456000;
+            const signature = await web3Sdk.getPermitSignatureERC721(signer, nft, marketContractAddress, tokenId, deadline);
 
-            const nftContractAddress = "0xb7cee7c808686f116bff25ca4473c66cbf164370";
-            contract = new ethers.Contract(nftContractAddress, v1Erc721contractAbi, backend);
-
-            // const tokensContractAddress = "0x2aef50c35b90b5274c4e432c96c20fbe599a284b";
-            // contract = new ethers.Contract(nftContractAddress, v1Erc20contractAbi, backend);
-            
-            console.log("Successfully attached backend address: ", backend.address);
+            // const signature = await web3Sdk.getPermitSignatureERC20(signer, contract, backend.address, tokenAmount, deadline);
+            console.log("Seller signature: ", signature);
         } catch (err) {
-            console.error("Error attaching to contract: ", err);
+            console.error("Error generating seller signature: ", err);
         }
     });
 
-    document.getElementById("generate-signature-btn").addEventListener("click", async () => {
+    document.getElementById("generate-buyer-signature-btn").addEventListener("click", async () => {
         try {
             if (!window.ethereum)
                 throw new Error("No crypto wallet found. Please install it.");
             await window.ethereum.send("eth_requestAccounts");
 
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            // const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-
-            const deadline = -1; // -1 means no deadline
-
-            const signature = await web3Sdk.getPermitSignatureERC721(signer, contract, backend.address, tokenId, deadline);
-
-            // const signature = await web3Sdk.getPermitSignatureERC2-(signer, contract, backend.address, tokenAmount, deadline);
-            console.log("Off-chain signature: ", signature);
+            const deadline = 1893456000;
+            const signature = await web3Sdk.getPermitSignatureERC20(signer, tokens, marketContractAddress, tokenAmount, deadline);
+            console.log("Buyer signature: ", signature);
         } catch (err) {
-            console.error("Error generating off-chain signature: ", err);
+            console.error("Error generating buyer signature: ", err);
         }
     });
 </script>
