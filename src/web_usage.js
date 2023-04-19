@@ -27,8 +27,9 @@ export default function Web3Sdk() {
     }
 
     const getPermitSignatureERC20 = async (signer, tokens, spender, value, deadline) => {
+        const signerAddress = await signer.getAddress();
         const [nonce, name, version, chainId] = await Promise.all([
-            tokens.nonces(signer.address),
+            tokens.nonces(signerAddress),
             tokens.name(),
             "1",
             signer.getChainId(),
@@ -76,8 +77,9 @@ export default function Web3Sdk() {
     }
 
     const getPermitSignatureERC721 = async (signer, nft, spender, tokenId, deadline) => {
+        const signerAddress = await signer.getAddress();
         const [nonce, name, version, chainId] = await Promise.all([
-            nft.nonces(signer.address),
+            nft.nonces(signerAddress),
             nft.name(),
             "1",
             signer.getChainId(),
